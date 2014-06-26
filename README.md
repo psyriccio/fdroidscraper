@@ -1,4 +1,4 @@
 fdroidscraper
 =============
 
-Scraper that downloads Android Apps from the froid repository
+Scraper to downloads Android Apps from the F-Droid repository
