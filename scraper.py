@@ -39,6 +39,7 @@ def get_projects(url, page, category, numberapps):
 	projects = []
 	stop = False
 	while (not stop and len(projects) < numberapps):
+		print "Parsing page " + str(page)
 		url = URL.format(category,str(page))
 		soup = gen_soup(url)
 		post_entry = soup.find("div", "post-entry")
@@ -62,12 +63,12 @@ def download_file(url, path):
 	out.close()
 
 def download_project(project, outputdir):
-	if (project["apk_url"]):
+	if ("apk_url" in project):
 		#save apk
 		filename = os.path.join(outputdir, project["id"] + ".apk")
 		download_file(project["apk_url"], filename)
 
-	if (project["source_url"]):
+	if ("source_url" in project):
 		#save source files
 		filename = os.path.join(outputdir, project["id"] + ".tar.gz")
 		download_file(project["source_url"], filename)
@@ -77,12 +78,13 @@ def save_file(project, outputdir):
 	f = open(file_path, "w")
 	keys = ["id", "title", "description", "apk_url", "source_url"]
 	for key in keys:
-		f.write(key + " = " + project[key] + "\n")
+		if key in project:
+			f.write(key + " = " + project[key] + "\n")
 	f.close()
 
 def save_project(project, outputdir):
 	#first create the directory for the app
-	print "Saving project " + project['title'] + " ..."
+	print "Saving project " + project['title'] + " (" + project['id'] + ") ..."
 	appdir = os.path.join(outputdir, project["id"])
 	if not os.path.isdir(appdir):
 		os.mkdir(appdir)
@@ -91,7 +93,8 @@ def save_project(project, outputdir):
 	download_project(project, appdir)
 
 def save_projects(projects, outputdir):
-	return [save_project(project, outputdir) for project in projects]
+	for project in projects:
+		save_project(project, outputdir)
 
 URL = "https://f-droid.org/repository/browse/?fdcategory={0}&fdpage={1}"
 
